@@ -38,7 +38,7 @@ function createFileItem(itemData, index, itemCount, currentMode) {
   pageTools.className = "page-tools";
   pageToolsHeader.className = "page-tools-header";
   pageToolsTitle.className = "page-tools-title";
-  pageToolsTitle.textContent = currentMode === "merge" ? "Pages to keep in merge" : "Pages to extract";
+  pageToolsTitle.textContent = getPageToolsTitle(currentMode);
   pageActions.className = "file-controls";
   pageChipList.className = "page-chip-list";
 
@@ -89,4 +89,16 @@ function createPageButton(index, pageIndex, isIncluded) {
   button.textContent = `Page ${pageIndex + 1}`;
   button.title = isIncluded ? "Click to remove this page from the output" : "Click to add this page back";
   return button;
+}
+
+function getPageToolsTitle(currentMode) {
+  if (currentMode === "merge") {
+    return "Pages to keep in merge";
+  }
+
+  if (currentMode === "extract") {
+    return "Pages to extract";
+  }
+
+  return "Pages to convert";
 }

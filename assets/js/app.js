@@ -8,6 +8,7 @@ import {
   getOutputName,
   getTotalIncludedPages,
 } from "./services/pdf-service.js";
+import { createImagesZipBlob, getImagesOutputName } from "./services/image-service.js";
 import { createPreviewController } from "./controllers/preview-controller.js";
 
 let currentMode = "merge";
@@ -21,7 +22,7 @@ elements.fileInput.addEventListener("change", async () => {
   previewController.clearPreview();
 
   const files = Array.from(elements.fileInput.files);
-  const usableFiles = currentMode === "extract" ? files.slice(0, 1) : files;
+  const usableFiles = currentMode === "merge" ? files : files.slice(0, 1);
 
   if (!usableFiles.length) {
     pdfItems = [];
@@ -37,9 +38,7 @@ elements.fileInput.addEventListener("change", async () => {
     pdfItems = await Promise.all(usableFiles.map(createPdfItem));
     renderFileList();
     setStatus(
-      currentMode === "merge"
-        ? `${pdfItems.length} PDF file${pdfItems.length === 1 ? "" : "s"} selected.`
-        : `${pdfItems[0].file.name} loaded with ${pdfItems[0].pageCount} page${pdfItems[0].pageCount === 1 ? "" : "s"}.`,
+      getSelectionStatus(),
     );
   } catch (error) {
     console.error(error);
@@ -90,6 +89,9 @@ elements.fileList.addEventListener("click", (event) => {
 });
 
 elements.clearPreviewButton.addEventListener("click", previewController.clearPreview);
+elements.imageFormat.addEventListener("change", () => {
+  downloadController.revokeDownloadUrl();
+});
 
 elements.modeButtons.forEach((button) => {
   button.addEventListener("click", () => setMode(button.dataset.mode));
@@ -201,20 +203,22 @@ async function createOutputPdf() {
 
   elements.createButton.disabled = true;
   elements.downloadLink.classList.add("hidden");
-  setStatus(currentMode === "merge" ? "Merging selected pages..." : "Extracting selected pages...");
+  setStatus(getWorkingStatus());
 
   try {
+    if (currentMode === "image") {
+      const blob = await createImagesZipBlob(pdfItems[0], elements.imageFormat.value);
+      downloadController.showDownload(blob, getImagesOutputName(pdfItems[0]));
+      setStatus("Image ZIP is ready to download.", "success");
+      return;
+    }
+
     const blob = await createOutputPdfBlob(pdfItems);
     downloadController.showDownload(blob, getOutputName(currentMode));
-    setStatus(
-      currentMode === "merge"
-        ? "Merged PDF is ready to download."
-        : "Extracted PDF is ready to download.",
-      "success",
-    );
+    setStatus(getSuccessStatus(), "success");
   } catch (error) {
     console.error(error);
-    setStatus("Could not create the PDF. Make sure every selected file is valid.", "error");
+    setStatus("Could not create the output. Make sure every selected file is valid.", "error");
   } finally {
     updateCreateButton();
   }
@@ -225,3 +229,29 @@ function updateCreateButton() {
 }
 
 updateModeContent(currentMode, elements);
+
+function getSelectionStatus() {
+  if (currentMode === "merge") {
+    return `${pdfItems.length} PDF file${pdfItems.length === 1 ? "" : "s"} selected.`;
+  }
+
+  return `${pdfItems[0].file.name} loaded with ${pdfItems[0].pageCount} page${pdfItems[0].pageCount === 1 ? "" : "s"}.`;
+}
+
+function getWorkingStatus() {
+  if (currentMode === "merge") {
+    return "Merging selected pages...";
+  }
+
+  if (currentMode === "extract") {
+    return "Extracting selected pages...";
+  }
+
+  return "Converting selected pages to images...";
+}
+
+function getSuccessStatus() {
+  return currentMode === "merge"
+    ? "Merged PDF is ready to download."
+    : "Extracted PDF is ready to download.";
+}

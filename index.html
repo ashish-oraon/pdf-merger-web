@@ -12,7 +12,7 @@
         <p class="eyebrow">Browser-only PDF tool</p>
         <h1>PDF tools that run locally</h1>
         <p>
-          Merge PDFs, remove pages before merging, or extract pages from a PDF.
+          Merge PDFs, remove pages before merging, extract pages, or convert PDF pages to images.
           Your documents stay in your browser and are never uploaded.
         </p>
       </section>
@@ -25,6 +25,9 @@
           <button id="extract-mode-button" class="mode-button" type="button" data-mode="extract">
             Extract pages
           </button>
+          <button id="image-mode-button" class="mode-button" type="button" data-mode="image">
+            Convert to images
+          </button>
         </div>
 
         <h2 id="upload-title">Choose PDFs</h2>
@@ -36,6 +39,14 @@
           <span class="drop-zone-help">Use Ctrl or Shift to select multiple files.</span>
           <input id="pdf-input" type="file" accept="application/pdf,.pdf" multiple>
         </label>
+
+        <div id="image-options" class="image-options hidden">
+          <label for="image-format">Image format</label>
+          <select id="image-format">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+          </select>
+        </div>
 
         <div class="file-summary">
           <h3 id="file-summary-title">Merge order and pages</h3>
@@ -69,6 +80,7 @@
     </main>
 
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
     <script type="module" src="assets/js/app.js"></script>
   </body>
 </html>

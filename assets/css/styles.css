@@ -70,7 +70,7 @@ h1 {
 
 .mode-switch {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 26px;
 }
@@ -125,6 +125,29 @@ input[type="file"] {
   height: 1px;
   overflow: hidden;
   opacity: 0;
+}
+
+.image-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.image-options label {
+  color: #4a5870;
+  font-weight: 700;
+}
+
+.image-options select {
+  min-height: 40px;
+  border: 1px solid #cfe0f5;
+  border-radius: 10px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: #172033;
+  font: inherit;
 }
 
 .file-summary {

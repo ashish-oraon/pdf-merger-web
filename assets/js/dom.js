@@ -14,4 +14,6 @@ export const elements = {
   dropZoneTitle: document.querySelector("#drop-zone-title"),
   fileSummaryTitle: document.querySelector("#file-summary-title"),
   fileSummaryHelp: document.querySelector("#file-summary-help"),
+  imageOptions: document.querySelector("#image-options"),
+  imageFormat: document.querySelector("#image-format"),
 };
