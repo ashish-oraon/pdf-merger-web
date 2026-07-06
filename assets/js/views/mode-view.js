@@ -11,6 +11,7 @@ export function updateModeContent(currentMode, elements) {
     elements.fileSummaryHelp.textContent = "Use the controls beside each file to preview it, change merge order, or remove pages from the output.";
     elements.createButton.textContent = "Merge PDFs";
     elements.downloadLink.download = "ErsteHilfe.pdf";
+    elements.downloadLink.textContent = "Download PDF";
     elements.imageOptions.classList.add("hidden");
     return;
   }
@@ -23,6 +24,7 @@ export function updateModeContent(currentMode, elements) {
     elements.fileSummaryHelp.textContent = "Preview the PDF, then toggle pages on or off before creating the extracted PDF.";
     elements.createButton.textContent = "Extract pages";
     elements.downloadLink.download = "ExtractedPages.pdf";
+    elements.downloadLink.textContent = "Download PDF";
     elements.imageOptions.classList.add("hidden");
     return;
   }
@@ -34,5 +36,6 @@ export function updateModeContent(currentMode, elements) {
   elements.fileSummaryHelp.textContent = "Preview the PDF, then toggle pages on or off before converting them to images.";
   elements.createButton.textContent = "Convert to images";
   elements.downloadLink.download = "PdfImages.zip";
+  elements.downloadLink.textContent = "Download images ZIP";
   elements.imageOptions.classList.remove("hidden");
 }
