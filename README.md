@@ -4,7 +4,13 @@ A small static webapp for merging PDFs and extracting pages directly in the brow
 
 ## Use Locally
 
-Open `index.html` in a browser and choose either `Merge PDFs` or `Extract pages`.
+Serve this folder with a static server, then open the local URL and choose either `Merge PDFs` or `Extract pages`.
+
+```powershell
+python -m http.server 8000
+```
+
+Then open `http://localhost:8000`.
 
 In `Merge PDFs`, select one or more PDF files, arrange them with the `Up` and `Down` buttons, remove any pages you do not want, click `Merge PDFs`, and download the generated `ErsteHilfe.pdf`.
 
