@@ -1,0 +1,17 @@
+export const elements = {
+  fileInput: document.querySelector("#pdf-input"),
+  fileList: document.querySelector("#file-list"),
+  createButton: document.querySelector("#create-button"),
+  downloadLink: document.querySelector("#download-link"),
+  statusMessage: document.querySelector("#status"),
+  previewFrame: document.querySelector("#pdf-preview"),
+  previewName: document.querySelector("#preview-name"),
+  previewPlaceholder: document.querySelector("#preview-placeholder"),
+  clearPreviewButton: document.querySelector("#clear-preview-button"),
+  modeButtons: document.querySelectorAll(".mode-button"),
+  uploadTitle: document.querySelector("#upload-title"),
+  modeHelp: document.querySelector("#mode-help"),
+  dropZoneTitle: document.querySelector("#drop-zone-title"),
+  fileSummaryTitle: document.querySelector("#file-summary-title"),
+  fileSummaryHelp: document.querySelector("#file-summary-help"),
+};
