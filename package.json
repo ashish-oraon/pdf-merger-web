@@ -1,0 +1,11 @@
+{
+  "name": "pdf-merger-web",
+  "private": true,
+  "description": "Browser-only PDF portal",
+  "scripts": {
+    "deploy": "gh-pages -d . --nojekyll"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
+}

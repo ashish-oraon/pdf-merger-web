@@ -1,3 +1,5 @@
+import { removePdfExtension } from "../utils/format.js";
+
 export async function createPdfItem(file) {
   const bytes = await file.arrayBuffer();
   const document = await window.PDFLib.PDFDocument.load(bytes);
@@ -30,8 +32,26 @@ export async function createOutputPdfBlob(pdfItems) {
   return new Blob([outputBytes], { type: "application/pdf" });
 }
 
-export function getOutputName(mode) {
-  return mode === "merge" ? "ErsteHilfe.pdf" : "ExtractedPages.pdf";
+export function getOutputName(mode, pdfItems = []) {
+  if (mode === "merge") {
+    return "Merged.pdf";
+  }
+
+  const sourceName = pdfItems[0]?.file?.name;
+
+  if (mode === "extract" && sourceName) {
+    return `${removePdfExtension(sourceName)}-extracted.pdf`;
+  }
+
+  if (mode === "compress" && sourceName) {
+    return `${removePdfExtension(sourceName)}-compressed.pdf`;
+  }
+
+  if (mode === "extract") {
+    return "ExtractedPages.pdf";
+  }
+
+  return "Compressed.pdf";
 }
 
 export function getTotalIncludedPages(pdfItems) {

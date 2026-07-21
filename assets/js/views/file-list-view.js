@@ -100,5 +100,9 @@ function getPageToolsTitle(currentMode) {
     return "Pages to extract";
   }
 
+  if (currentMode === "compress") {
+    return "Pages to compress";
+  }
+
   return "Pages to convert";
 }
