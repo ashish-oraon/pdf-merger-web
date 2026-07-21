@@ -70,7 +70,7 @@ h1 {
 
 .mode-switch {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 26px;
 }
@@ -81,7 +81,12 @@ h1 {
   border-radius: 18px;
   background: #ffffff;
   color: #245182;
-  font-size: 1rem;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.25;
+  padding: 12px 10px;
+  text-align: center;
 }
 
 .mode-button.active {
@@ -127,7 +132,7 @@ input[type="file"] {
   opacity: 0;
 }
 
-.image-options {
+.tool-options {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -135,12 +140,12 @@ input[type="file"] {
   margin-top: 18px;
 }
 
-.image-options label {
+.tool-options label {
   color: #4a5870;
   font-weight: 700;
 }
 
-.image-options select {
+.tool-options select {
   min-height: 40px;
   border: 1px solid #cfe0f5;
   border-radius: 10px;
@@ -360,7 +365,7 @@ button:disabled {
   }
 
   .mode-switch {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
   .file-item,
@@ -376,5 +381,11 @@ button:disabled {
   .pdf-preview,
   .preview-placeholder {
     min-height: 420px;
+  }
+}
+
+@media (max-width: 420px) {
+  .mode-switch {
+    grid-template-columns: 1fr;
   }
 }

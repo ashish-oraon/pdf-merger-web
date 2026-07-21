@@ -12,7 +12,7 @@
         <p class="eyebrow">Browser-only PDF tool</p>
         <h1>PDF tools that run locally</h1>
         <p>
-          Merge PDFs, remove pages before merging, extract pages, or convert PDF pages to images.
+          Merge PDFs, extract pages, compress PDFs, or convert PDF pages to images.
           Your documents stay in your browser and are never uploaded.
         </p>
       </section>
@@ -24,6 +24,9 @@
           </button>
           <button id="extract-mode-button" class="mode-button" type="button" data-mode="extract">
             Extract pages
+          </button>
+          <button id="compress-mode-button" class="mode-button" type="button" data-mode="compress">
+            Compress PDF
           </button>
           <button id="image-mode-button" class="mode-button" type="button" data-mode="image">
             Convert to images
@@ -40,11 +43,20 @@
           <input id="pdf-input" type="file" accept="application/pdf,.pdf" multiple>
         </label>
 
-        <div id="image-options" class="image-options hidden">
+        <div id="image-options" class="tool-options hidden">
           <label for="image-format">Image format</label>
           <select id="image-format">
             <option value="png">PNG</option>
             <option value="jpeg">JPEG</option>
+          </select>
+        </div>
+
+        <div id="compress-options" class="tool-options hidden">
+          <label for="compress-quality">Compression level</label>
+          <select id="compress-quality">
+            <option value="low">Smaller file (lower quality)</option>
+            <option value="medium" selected>Balanced</option>
+            <option value="high">Higher quality (larger file)</option>
           </select>
         </div>
 
@@ -72,7 +84,7 @@
 
         <div class="actions">
           <button id="create-button" type="button" disabled>Merge PDFs</button>
-          <a id="download-link" class="download-link hidden" download="ErsteHilfe.pdf">Download PDF</a>
+          <a id="download-link" class="download-link hidden">Download PDF</a>
         </div>
 
         <p id="status" class="status" role="status" aria-live="polite"></p>

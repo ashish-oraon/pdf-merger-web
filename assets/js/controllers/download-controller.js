@@ -1,11 +1,13 @@
 export function createDownloadController(downloadLink) {
   let currentDownloadUrl = null;
 
-  function showDownload(blob, fileName) {
+  function showDownload(blob, fileName, label = "Download PDF") {
     revokeDownloadUrl();
     currentDownloadUrl = URL.createObjectURL(blob);
-    downloadLink.href = currentDownloadUrl;
+    downloadLink.setAttribute("download", fileName);
     downloadLink.download = fileName;
+    downloadLink.href = currentDownloadUrl;
+    downloadLink.textContent = label;
     downloadLink.classList.remove("hidden");
   }
 
@@ -16,6 +18,7 @@ export function createDownloadController(downloadLink) {
     }
 
     downloadLink.removeAttribute("href");
+    downloadLink.removeAttribute("download");
     downloadLink.classList.add("hidden");
   }
 

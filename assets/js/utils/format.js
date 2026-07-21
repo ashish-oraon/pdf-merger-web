@@ -14,3 +14,7 @@ export function formatFileSize(bytes) {
 
   return `${size.toFixed(size >= 10 ? 1 : 2)} ${units[unitIndex]}`;
 }
+
+export function removePdfExtension(fileName) {
+  return fileName.replace(/\.pdf$/i, "");
+}

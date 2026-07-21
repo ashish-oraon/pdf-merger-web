@@ -9,7 +9,9 @@ import {
   getTotalIncludedPages,
 } from "./services/pdf-service.js";
 import { createImagesZipBlob, getImagesOutputName } from "./services/image-service.js";
+import { createCompressedPdfBlob, getCompressedOutputName } from "./services/compress-service.js";
 import { createPreviewController } from "./controllers/preview-controller.js";
+import { formatFileSize } from "./utils/format.js";
 
 let currentMode = "merge";
 let pdfItems = [];
@@ -37,9 +39,7 @@ elements.fileInput.addEventListener("change", async () => {
   try {
     pdfItems = await Promise.all(usableFiles.map(createPdfItem));
     renderFileList();
-    setStatus(
-      getSelectionStatus(),
-    );
+    setStatus(getSelectionStatus());
   } catch (error) {
     console.error(error);
     pdfItems = [];
@@ -92,12 +92,15 @@ elements.clearPreviewButton.addEventListener("click", previewController.clearPre
 elements.imageFormat.addEventListener("change", () => {
   downloadController.revokeDownloadUrl();
 });
+elements.compressQuality.addEventListener("change", () => {
+  downloadController.revokeDownloadUrl();
+});
 
 elements.modeButtons.forEach((button) => {
   button.addEventListener("click", () => setMode(button.dataset.mode));
 });
 
-elements.createButton.addEventListener("click", createOutputPdf);
+elements.createButton.addEventListener("click", createOutput);
 
 window.addEventListener("beforeunload", () => {
   downloadController.revokeDownloadUrl();
@@ -188,7 +191,7 @@ function setAllPages(index, shouldInclude) {
   setStatus(shouldInclude ? "All pages included." : "All pages removed from this output.");
 }
 
-async function createOutputPdf() {
+async function createOutput() {
   if (!pdfItems.length) {
     setStatus(currentMode === "merge" ? "Choose at least one PDF first." : "Choose a PDF first.", "error");
     return;
@@ -197,7 +200,7 @@ async function createOutputPdf() {
   const totalIncludedPages = getTotalIncludedPages(pdfItems);
 
   if (!totalIncludedPages) {
-    setStatus("Select at least one page for the output PDF.", "error");
+    setStatus("Select at least one page for the output.", "error");
     return;
   }
 
@@ -208,13 +211,26 @@ async function createOutputPdf() {
   try {
     if (currentMode === "image") {
       const blob = await createImagesZipBlob(pdfItems[0], elements.imageFormat.value);
-      downloadController.showDownload(blob, getImagesOutputName(pdfItems[0]));
+      downloadController.showDownload(blob, getImagesOutputName(pdfItems[0]), "Download images ZIP");
       setStatus("Image ZIP is ready to download.", "success");
       return;
     }
 
+    if (currentMode === "compress") {
+      const sourceSize = pdfItems[0].file.size;
+      const blob = await createCompressedPdfBlob(pdfItems[0], elements.compressQuality.value);
+      downloadController.showDownload(blob, getCompressedOutputName(pdfItems[0]), "Download compressed PDF");
+      setStatus(
+        `Compressed PDF is ready to download (${formatFileSize(sourceSize)} → ${formatFileSize(blob.size)}).`,
+        "success",
+      );
+      return;
+    }
+
     const blob = await createOutputPdfBlob(pdfItems);
-    downloadController.showDownload(blob, getOutputName(currentMode));
+    const fileName = getOutputName(currentMode, pdfItems);
+    const downloadLabel = currentMode === "merge" ? "Download merged PDF" : "Download extracted PDF";
+    downloadController.showDownload(blob, fileName, downloadLabel);
     setStatus(getSuccessStatus(), "success");
   } catch (error) {
     console.error(error);
@@ -247,11 +263,17 @@ function getWorkingStatus() {
     return "Extracting selected pages...";
   }
 
+  if (currentMode === "compress") {
+    return "Compressing selected pages...";
+  }
+
   return "Converting selected pages to images...";
 }
 
 function getSuccessStatus() {
-  return currentMode === "merge"
-    ? "Merged PDF is ready to download."
-    : "Extracted PDF is ready to download.";
+  if (currentMode === "merge") {
+    return "Merged PDF is ready to download.";
+  }
+
+  return "Extracted PDF is ready to download.";
 }

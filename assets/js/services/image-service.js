@@ -1,4 +1,5 @@
 import { getDocument, GlobalWorkerOptions } from "https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.mjs";
+import { removePdfExtension } from "../utils/format.js";
 
 GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.worker.mjs";
 
@@ -60,8 +61,4 @@ async function renderPageToBlob(page, mimeType) {
       0.92,
     );
   });
-}
-
-function removePdfExtension(fileName) {
-  return fileName.replace(/\.pdf$/i, "");
 }

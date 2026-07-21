@@ -16,4 +16,6 @@ export const elements = {
   fileSummaryHelp: document.querySelector("#file-summary-help"),
   imageOptions: document.querySelector("#image-options"),
   imageFormat: document.querySelector("#image-format"),
+  compressOptions: document.querySelector("#compress-options"),
+  compressQuality: document.querySelector("#compress-quality"),
 };
