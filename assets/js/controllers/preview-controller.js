@@ -5,23 +5,38 @@ export function createPreviewController({
   clearPreviewButton,
 }) {
   let currentPreviewUrl = null;
+  let previewedIndex = null;
 
-  function previewFile(itemData) {
-    if (!itemData) {
-      return;
-    }
-
+  function showPreview(blobOrFile, fileName, index = null) {
     revokePreviewUrl();
-    currentPreviewUrl = URL.createObjectURL(itemData.file);
+    currentPreviewUrl = URL.createObjectURL(blobOrFile);
+    previewedIndex = index;
     previewFrame.src = currentPreviewUrl;
     previewFrame.classList.remove("hidden");
     previewPlaceholder.classList.add("hidden");
     clearPreviewButton.classList.remove("hidden");
-    previewName.textContent = itemData.file.name;
+    previewName.textContent = fileName;
+  }
+
+  function previewFile(itemData, index = null) {
+    if (!itemData) {
+      return;
+    }
+
+    showPreview(itemData.file, itemData.file.name, index);
+  }
+
+  function previewBlob(blob, fileName, index = null) {
+    if (!blob) {
+      return;
+    }
+
+    showPreview(blob, fileName, index);
   }
 
   function clearPreview() {
     revokePreviewUrl();
+    previewedIndex = null;
     previewFrame.removeAttribute("src");
     previewFrame.classList.add("hidden");
     previewPlaceholder.classList.remove("hidden");
@@ -36,9 +51,15 @@ export function createPreviewController({
     }
   }
 
+  function getPreviewedIndex() {
+    return previewedIndex;
+  }
+
   return {
     previewFile,
+    previewBlob,
     clearPreview,
     revokePreviewUrl,
+    getPreviewedIndex,
   };
 }

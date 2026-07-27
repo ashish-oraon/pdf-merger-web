@@ -9,6 +9,7 @@ export async function createPdfItem(file) {
     file,
     pageCount,
     includedPages: new Set(Array.from({ length: pageCount }, (_, index) => index)),
+    pageRotations: Array.from({ length: pageCount }, () => 0),
   };
 }
 
@@ -47,11 +48,19 @@ export function getOutputName(mode, pdfItems = []) {
     return `${removePdfExtension(sourceName)}-compressed.pdf`;
   }
 
+  if (mode === "rotate" && sourceName) {
+    return `${removePdfExtension(sourceName)}-rotated.pdf`;
+  }
+
   if (mode === "extract") {
     return "ExtractedPages.pdf";
   }
 
-  return "Compressed.pdf";
+  if (mode === "compress") {
+    return "Compressed.pdf";
+  }
+
+  return "Rotated.pdf";
 }
 
 export function getTotalIncludedPages(pdfItems) {

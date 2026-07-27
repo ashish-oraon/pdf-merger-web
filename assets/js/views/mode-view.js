@@ -21,6 +21,17 @@ const MODE_COPY = {
     showImageOptions: false,
     showCompressOptions: false,
   },
+  rotate: {
+    uploadTitle: "Choose a PDF",
+    modeHelp: "Select one PDF, click pages to rotate them in 90° steps, then download the rotated file.",
+    dropZoneTitle: "Select one PDF file",
+    fileSummaryTitle: "Pages to rotate",
+    fileSummaryHelp: "Preview the PDF, then click page chips to cycle each page through 90°, 180°, 270°, and back to 0°.",
+    createButton: "Rotate pages",
+    downloadLabel: "Download rotated PDF",
+    showImageOptions: false,
+    showCompressOptions: false,
+  },
   image: {
     uploadTitle: "Choose a PDF",
     modeHelp: "Select one PDF, choose pages, select PNG or JPEG, then download a ZIP of images.",
