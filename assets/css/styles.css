@@ -70,7 +70,7 @@ h1 {
 
 .mode-switch {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 26px;
 }
@@ -244,6 +244,12 @@ input[type="file"] {
   text-decoration: line-through;
 }
 
+.page-chip.rotated {
+  border-color: #3164a8;
+  background: #3164a8;
+  color: #ffffff;
+}
+
 .file-controls {
   display: flex;
   flex-wrap: wrap;
@@ -352,6 +358,12 @@ button:disabled {
 
 .status.success {
   color: #067647;
+}
+
+@media (max-width: 900px) {
+  .mode-switch {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 620px) {

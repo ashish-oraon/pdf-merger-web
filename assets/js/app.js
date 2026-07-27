@@ -10,6 +10,11 @@ import {
 } from "./services/pdf-service.js";
 import { createImagesZipBlob, getImagesOutputName } from "./services/image-service.js";
 import { createCompressedPdfBlob, getCompressedOutputName } from "./services/compress-service.js";
+import {
+  createRotatedPdfBlob,
+  getRotatedOutputName,
+  getRotatedPageCount,
+} from "./services/rotate-service.js";
 import { createPreviewController } from "./controllers/preview-controller.js";
 import { formatFileSize } from "./utils/format.js";
 
@@ -85,6 +90,21 @@ elements.fileList.addEventListener("click", (event) => {
 
   if (action === "toggle-page") {
     togglePage(index, Number(button.dataset.pageIndex));
+    return;
+  }
+
+  if (action === "cycle-rotation") {
+    cyclePageRotation(index, Number(button.dataset.pageIndex));
+    return;
+  }
+
+  if (action === "rotate-all") {
+    rotateAllPages(index);
+    return;
+  }
+
+  if (action === "reset-rotations") {
+    resetRotations(index);
   }
 });
 
@@ -125,15 +145,36 @@ function moveFile(index, direction) {
   setStatus("Merge order updated.");
 }
 
-function previewFile(index) {
+async function previewFile(index) {
   const itemData = pdfItems[index];
 
   if (!itemData) {
     return;
   }
 
-  previewController.previewFile(itemData);
+  if (currentMode === "rotate") {
+    setStatus(`Building rotated preview for ${itemData.file.name}...`);
+    try {
+      const blob = await createRotatedPdfBlob(itemData);
+      previewController.previewBlob(blob, `${itemData.file.name} (rotated preview)`, index);
+      setStatus(`Previewing rotated ${itemData.file.name}.`);
+    } catch (error) {
+      console.error(error);
+      setStatus("Could not build a rotated preview for this PDF.", "error");
+    }
+    return;
+  }
+
+  previewController.previewFile(itemData, index);
   setStatus(`Previewing ${itemData.file.name}.`);
+}
+
+async function refreshRotatePreviewIfNeeded(index) {
+  if (currentMode !== "rotate" || previewController.getPreviewedIndex() !== index) {
+    return;
+  }
+
+  await previewFile(index);
 }
 
 function setStatus(message, type = "") {
@@ -191,15 +232,60 @@ function setAllPages(index, shouldInclude) {
   setStatus(shouldInclude ? "All pages included." : "All pages removed from this output.");
 }
 
+function cyclePageRotation(index, pageIndex) {
+  const itemData = pdfItems[index];
+
+  if (!itemData) {
+    return;
+  }
+
+  itemData.pageRotations[pageIndex] = (itemData.pageRotations[pageIndex] + 90) % 360;
+  downloadController.revokeDownloadUrl();
+  renderFileList();
+  setStatus(`Page ${pageIndex + 1} set to ${itemData.pageRotations[pageIndex]}°.`);
+  refreshRotatePreviewIfNeeded(index);
+}
+
+function rotateAllPages(index) {
+  const itemData = pdfItems[index];
+
+  if (!itemData) {
+    return;
+  }
+
+  itemData.pageRotations = itemData.pageRotations.map((rotation) => (rotation + 90) % 360);
+  downloadController.revokeDownloadUrl();
+  renderFileList();
+  setStatus("All pages rotated by 90°.");
+  refreshRotatePreviewIfNeeded(index);
+}
+
+function resetRotations(index) {
+  const itemData = pdfItems[index];
+
+  if (!itemData) {
+    return;
+  }
+
+  itemData.pageRotations = Array.from({ length: itemData.pageCount }, () => 0);
+  downloadController.revokeDownloadUrl();
+  renderFileList();
+  setStatus("Page rotations reset.");
+  refreshRotatePreviewIfNeeded(index);
+}
+
 async function createOutput() {
   if (!pdfItems.length) {
     setStatus(currentMode === "merge" ? "Choose at least one PDF first." : "Choose a PDF first.", "error");
     return;
   }
 
-  const totalIncludedPages = getTotalIncludedPages(pdfItems);
-
-  if (!totalIncludedPages) {
+  if (currentMode === "rotate") {
+    if (!getRotatedPageCount(pdfItems[0])) {
+      setStatus("Rotate at least one page before creating the PDF.", "error");
+      return;
+    }
+  } else if (!getTotalIncludedPages(pdfItems)) {
     setStatus("Select at least one page for the output.", "error");
     return;
   }
@@ -224,6 +310,13 @@ async function createOutput() {
         `Compressed PDF is ready to download (${formatFileSize(sourceSize)} → ${formatFileSize(blob.size)}).`,
         "success",
       );
+      return;
+    }
+
+    if (currentMode === "rotate") {
+      const blob = await createRotatedPdfBlob(pdfItems[0]);
+      downloadController.showDownload(blob, getRotatedOutputName(pdfItems[0]), "Download rotated PDF");
+      setStatus("Rotated PDF is ready to download.", "success");
       return;
     }
 
@@ -265,6 +358,10 @@ function getWorkingStatus() {
 
   if (currentMode === "compress") {
     return "Compressing selected pages...";
+  }
+
+  if (currentMode === "rotate") {
+    return "Rotating selected pages...";
   }
 
   return "Converting selected pages to images...";

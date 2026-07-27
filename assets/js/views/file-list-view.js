@@ -33,7 +33,7 @@ function createFileItem(itemData, index, itemCount, currentMode) {
   name.className = "file-name";
   name.textContent = itemData.file.name;
   meta.className = "file-meta";
-  meta.textContent = `${formatFileSize(itemData.file.size)} - ${itemData.pageCount} page${itemData.pageCount === 1 ? "" : "s"} - ${itemData.includedPages.size} included`;
+  meta.textContent = getFileMeta(itemData, currentMode);
   controls.className = "file-controls";
   pageTools.className = "page-tools";
   pageToolsHeader.className = "page-tools-header";
@@ -51,13 +51,24 @@ function createFileItem(itemData, index, itemCount, currentMode) {
     );
   }
 
-  pageActions.append(
-    createListButton("Keep all", "include-all", index),
-    createListButton("Remove all", "exclude-all", index),
-  );
+  if (currentMode === "rotate") {
+    pageActions.append(
+      createListButton("Rotate all 90°", "rotate-all", index),
+      createListButton("Reset", "reset-rotations", index),
+    );
 
-  for (let pageIndex = 0; pageIndex < itemData.pageCount; pageIndex += 1) {
-    pageChipList.append(createPageButton(index, pageIndex, itemData.includedPages.has(pageIndex)));
+    for (let pageIndex = 0; pageIndex < itemData.pageCount; pageIndex += 1) {
+      pageChipList.append(createRotationPageButton(index, pageIndex, itemData.pageRotations[pageIndex]));
+    }
+  } else {
+    pageActions.append(
+      createListButton("Keep all", "include-all", index),
+      createListButton("Remove all", "exclude-all", index),
+    );
+
+    for (let pageIndex = 0; pageIndex < itemData.pageCount; pageIndex += 1) {
+      pageChipList.append(createPageButton(index, pageIndex, itemData.includedPages.has(pageIndex)));
+    }
   }
 
   pageToolsHeader.append(pageToolsTitle, pageActions);
@@ -91,6 +102,31 @@ function createPageButton(index, pageIndex, isIncluded) {
   return button;
 }
 
+function createRotationPageButton(index, pageIndex, rotation) {
+  const button = document.createElement("button");
+  const hasRotation = rotation !== 0;
+  button.type = "button";
+  button.className = hasRotation ? "page-chip rotated" : "page-chip";
+  button.dataset.action = "cycle-rotation";
+  button.dataset.index = String(index);
+  button.dataset.pageIndex = String(pageIndex);
+  button.textContent = hasRotation ? `Page ${pageIndex + 1} · ${rotation}°` : `Page ${pageIndex + 1}`;
+  button.title = "Click to rotate this page by 90°";
+  return button;
+}
+
+function getFileMeta(itemData, currentMode) {
+  const sizeLabel = formatFileSize(itemData.file.size);
+  const pageLabel = `${itemData.pageCount} page${itemData.pageCount === 1 ? "" : "s"}`;
+
+  if (currentMode === "rotate") {
+    const rotatedCount = itemData.pageRotations.filter((rotation) => rotation !== 0).length;
+    return `${sizeLabel} - ${pageLabel} - ${rotatedCount} rotated`;
+  }
+
+  return `${sizeLabel} - ${pageLabel} - ${itemData.includedPages.size} included`;
+}
+
 function getPageToolsTitle(currentMode) {
   if (currentMode === "merge") {
     return "Pages to keep in merge";
@@ -102,6 +138,10 @@ function getPageToolsTitle(currentMode) {
 
   if (currentMode === "compress") {
     return "Pages to compress";
+  }
+
+  if (currentMode === "rotate") {
+    return "Click a page to rotate it";
   }
 
   return "Pages to convert";
